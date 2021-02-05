@@ -1,0 +1,24 @@
+User
+-
+username string PK
+password string
+email string
+first_name string
+last_name string
+
+Recipe
+-
+title string PK
+image string
+URL string
+yield int
+ingredients array FK
+time
+username string FK
+
+Grocery_list
+-
+id int PK
+ingredient string FK
+purchased boolean
+username string FK
