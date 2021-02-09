@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block title %}{{ user.get_full_name() }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid text-center">
+    <h1 class="display-4">{{ user.get_full_name() }}</h1>
+    <hr>
+</div>
+{% endblock %}

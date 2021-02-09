@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap/dist/css/bootstrap.css">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+
+<body class="container bg-secondary">
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+        <a href="/" class="navbar-brand">Home</a>
+        <button class="navbar-toggler" data-toggle="collapse" data-target="#navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse justify-content-end" id="navigation">
+            <div class="navbar-nav">
+                {% if session['username'] %}
+                <a class="nav-link pr-3 text-light" href="/users/{{session['username']}}">{{session['username']}}</a>
+                <a class="nav-link pr-3 text-light" href="/logout">Logout</a>
+                {% else %}
+                <a class="nav-link pr-3 text-light" href="/login">Login</a>
+                <a class="nav-link pr-3 text-light" href="/register">Sign up</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <div class='jumbotron mt-5'>
+        <div class="container" style="margin-top: 2em">
+            {% for category, msg in get_flashed_messages(with_categories=True) %}
+            <div class="alert alert-{{category}}">{{ msg }}</div>
+            {% endfor %}
+        </div>
+
+        {% block content %}
+        {% endblock %}
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.6/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.js"></script>
+    <script src="../static/app.js"></script>
+</body>
+
+</html>

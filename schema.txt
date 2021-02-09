@@ -11,14 +11,15 @@ Recipe
 title string PK
 image string
 URL string
-yield int
-ingredients array FK
+yield float
+ingredients string
 time
+instructions string
 username string FK
 
 Grocery_list
 -
 id int PK
-ingredient string FK
+ingredient string
 purchased boolean
 username string FK
