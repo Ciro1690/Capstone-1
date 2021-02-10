@@ -1,12 +1,12 @@
 """Capstone 1 Project"""
 
-from flask import Flask, request, redirect, jsonify, json, render_template, session, flash
+from flask import Flask, request, redirect, jsonify, json, render_template, session, flash, url_for
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Recipe, Grocery_list
 from forms import RegisterForm, LoginForm, UserForm
 from sqlalchemy.exc import IntegrityError
 from secrets import EDAMAM_ID, EDAMAM_KEY
-import requests
+import requests, ast
 import os
 
 app = Flask(__name__)
@@ -78,30 +78,48 @@ def login_user():
 
 @app.route("/users/<username>")
 def user_info(username):
-    user = User.query.get_or_404(username)
-    return render_template("user_info.html", user=user)
-
-@app.route("/users/<username>/recipes/new", methods=['GET', 'POST'])
-def save_recipe(username):
-    """Save recipe to database"""
     if session['username'] != username:
         flash("Invalid credentials", "danger")
         return redirect('/')
-    form = PostForm()
-    if form.validate_on_submit():
-        title = form.title.data
-        content = form.content.data
-        rating = form.rating.data
+    
+    user = User.query.get_or_404(username)
+    return render_template("user_info.html", user=user)
 
-        user = User.query.get_or_404(username)
-        post = Post(title=title, content=content, rating=rating, username=username)
-        db.session.add(post)
-        db.session.commit()
+@app.route("/users/<username>/recipes/new", methods=['GET','POST'])
+def save_recipe(username):
+    """Save recipe to database"""
+    if 'username' not in session:
+        flash("Please login first", "danger")
+        return redirect('/')
 
-        flash('Recipe added', "success")
-        return redirect(f"/users/{username}")
-    tags = Tag.query.all()
-    return render_template("new_post.html", tags=tags, form=form)
+    recipe_data = request.get_json()['params']
+
+    title = recipe_data['title']
+    image = recipe_data['image']
+    calories = recipe_data['calories']
+    total_yield = recipe_data['yield']
+    time = recipe_data['time']
+    ingredients = recipe_data['ingredients']
+
+    recipe = Recipe(title=title, image=image, calories=calories, total_yield=total_yield, time=time, ingredients=ingredients, username=username)
+    db.session.add(recipe)
+    db.session.commit()
+
+    flash('Recipe added', 'success')
+    return redirect(f'/users/{username}')
+
+@app.route("/recipes/<int:recipe_id>")
+def show_recipe(recipe_id):
+    """Detail page for a single recipe"""
+
+    recipe = Recipe.query.get_or_404(recipe_id)
+    
+    ingredients = recipe.ingredients.split(',')
+    ingredients = [item.replace('"', '') for item in ingredients]
+    ingredients = [item.replace('{', '') for item in ingredients]
+    ingredients = [item.replace('}', '') for item in ingredients]
+
+    return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients)
 
 
 @app.route("/logout")

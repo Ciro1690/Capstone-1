@@ -5,5 +5,9 @@
 <div class="container-fluid text-center">
     <h1 class="display-4">{{ user.get_full_name() }}</h1>
     <hr>
+    <h2 class="m-3">{{ user.first_name }}'s Recipes</h2>
+    {% for recipe in user.recipes %}
+        <a href="/recipes/{{ recipe.id }}">{{ recipe.title }}</a><br>
+    {% endfor %}
 </div>
 {% endblock %}

@@ -79,10 +79,10 @@ class Recipe(db.Model):
     title = db.Column(db.String,
                     nullable=False)
     image = db.Column(db.String)
+    calories = db.Column(db.Integer)
     total_yield = db.Column(db.Float)
-    ingredients = db.Column(db.String)
     time = db.Column(db.Float)
-    instructions = db.Column(db.String)
+    ingredients = db.Column(db.String)
     username = db.Column(db.String,
                         db.ForeignKey('users.username'))
     user = db.relationship('User', backref='recipes')

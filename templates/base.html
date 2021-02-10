@@ -16,7 +16,7 @@
         <div class="collapse navbar-collapse justify-content-end" id="navigation">
             <div class="navbar-nav">
                 {% if session['username'] %}
-                <a class="nav-link pr-3 text-light" href="/users/{{session['username']}}">{{session['username']}}</a>
+                <a class="nav-link pr-3 text-light" id="username" href="/users/{{session['username']}}">{{session['username']}}</a>
                 <a class="nav-link pr-3 text-light" href="/logout">Logout</a>
                 {% else %}
                 <a class="nav-link pr-3 text-light" href="/login">Login</a>

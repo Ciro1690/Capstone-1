@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block title %}{{ recipe.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid text-center">
+    <h1>{{ recipe.title }}</h1>
+    <img src="{{recipe.image}}" alt="{{recipe.title}}">
+    <p>Calories: {{recipe.calories}}</p>
+    {% if recipe.time != None %}
+    <p>Cooktime: {{recipe.time}} mins</p>
+    {% endif %}
+    <p>Yield: {{recipe.total_yield}} servings</p>
+    <p>Ingredients: <br>
+        {% for ingredient in ingredients %} 
+        {{ingredient}}<br> 
+        {% endfor %}</p>
+</div>
+{% endblock %}

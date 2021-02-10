@@ -1,3 +1,5 @@
+let username = document.querySelector('#username').innerHTML
+
 async function processForm(evt) {
     evt.preventDefault()
     let search = $("#recipe").val()
@@ -11,17 +13,21 @@ async function processForm(evt) {
 }
 
 function handleResponse(resp) {
+    $('.recipe-list').empty()
     let recipes = resp['data']['hits']
     for (let recipeInfo of recipes) {
         let recipe = recipeInfo['recipe']
         
         let image = recipe['image']
+        let index = recipes.indexOf(recipeInfo)
         let title = recipe['label']
         let calories = Math.round(recipe['calories'])
         let url = recipe['url']
         let yield = recipe['yield']
         let time = recipe['totalTime'] === 0 ? null : recipe['totalTime']
         let ingredients = recipe['ingredientLines']
+        let source = recipe['source']
+
         let recipeObj = {
             "title": title,
             "image": image,
@@ -36,13 +42,21 @@ function handleResponse(resp) {
             <img class="card-img-top" src="${image}" alt="${title}">
             <div class="col card-body">
                 <h5 class="card-title">${title}</h5>
-                <p class="card-text">Calories: ${calories}</p>
-                <p class="card-text">Yield: ${yield} servings</p>
+                <p class="card-text">Source: ${source}</p>
                 <a href="${url}" class="btn btn-info" target="_blank">Full Recipe</a>
-                <button id="save-recipe" class="btn btn-primary">Save Recipe</button>
+                ${username ? `<button id="${index}" class="btn btn-primary">Save Recipe</button>` : ''}
                 </div>
             </div>`
-            $('.recipes-list').append(card);
+            $('.recipe-list').append(card);
+            if (username) {
+                document.getElementById(`${index}`).addEventListener('click', async function () {
+                    try {
+                        await axios.post(`/users/${username}/recipes/new`, { params: recipeObj });
+                    } catch (e) {
+                        console.log(e);
+                    }            
+                });
+            }
     }
 }
 

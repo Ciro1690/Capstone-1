@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
 {% block title %}Recipe Box{% endblock %}
-
 {% block content %}
 <div class="text-center">
     <h1 class="display-4">Welcome to recipe box!</h1><br>
+
     <form id="recipe-search">
         <h4>What are you in the mood for?</h4>
         <input type="text" id="recipe" name="recipe"><br>
         <button class="btn btn-success mt-3" type="submit">Search</button>
     </form>
-    <div class="recipes-list row"></div>
+    <div class="recipe-list row"></div>
 </div>
 {% endblock %}
+
