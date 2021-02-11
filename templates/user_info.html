@@ -2,12 +2,24 @@
 {% block title %}{{ user.get_full_name() }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid text-center">
-    <h1 class="display-4">{{ user.get_full_name() }}</h1>
-    <hr>
-    <h2 class="m-3">{{ user.first_name }}'s Recipes</h2>
-    {% for recipe in user.recipes %}
-        <a href="/recipes/{{ recipe.id }}">{{ recipe.title }}</a><br>
+<div class="container text-center mt-3">
+    {% for category, msg in get_flashed_messages(with_categories=True) %}
+    <div class="alert alert-{{category}}">{{ msg }}</div>
     {% endfor %}
+</div>
+<div class="container-fluid text-center">
+    <img class="mussels" src="../static/images/mussels.jpg" alt="mussels">
+    <h1 class="display-4 mt-2">{{ user.get_full_name() }}</h1>
+    <hr>
+    <h1 class="m-3">{{ user.first_name }}'s Saved Recipes</h1>
+    {% for recipe in user.recipes %}
+        <h4 class="row justify-content-md-center">
+            <a href="/recipes/{{ recipe.id }}">{{ recipe.title }}</a>
+            <form action="/recipes/{{recipe.id}}/delete" method="POST">
+                <button class="btn"><i class="fas fa-trash-alt"></i></button><br>
+            </form>
+        </h4>
+    {% endfor %}
+
 </div>
 {% endblock %}

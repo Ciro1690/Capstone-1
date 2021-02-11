@@ -3,9 +3,13 @@ let username = document.querySelector('#username').innerHTML
 async function processForm(evt) {
     evt.preventDefault()
     let search = $("#recipe").val()
+    let filter = []
+    protein.checked ? filter.push('high-protein') : ''
+    low_fat.checked ? filter.push('low-fat') : ''
+    low_carb.checked ? filter.push('low-carb') : ''
 
     try {
-        let response = await axios.post("/recipes", { params: search });
+        let response = await axios.post("/recipes", { params: search, filter: filter });
         handleResponse(response)
     } catch (e) {
         console.log(e);
@@ -31,6 +35,7 @@ function handleResponse(resp) {
         let recipeObj = {
             "title": title,
             "image": image,
+            "url": url,
             "calories": calories,
             "yield": yield,
             "time": time,
@@ -38,7 +43,7 @@ function handleResponse(resp) {
         }
         
         let card = `
-        <div class="card m-3" style="width: 18rem;">
+        <div class="card col-3">
             <img class="card-img-top" src="${image}" alt="${title}">
             <div class="col card-body">
                 <h5 class="card-title">${title}</h5>
@@ -51,7 +56,8 @@ function handleResponse(resp) {
             if (username) {
                 document.getElementById(`${index}`).addEventListener('click', async function () {
                     try {
-                        await axios.post(`/users/${username}/recipes/new`, { params: recipeObj });
+                        let response = await axios.post(`/users/${username}/recipes/new`, { params: recipeObj });
+                        alert(response['data']['message'])
                     } catch (e) {
                         console.log(e);
                     }            

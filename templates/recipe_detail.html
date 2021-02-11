@@ -2,17 +2,24 @@
 {% block title %}{{ recipe.title }}{% endblock %}
 
 {% block content %}
-<div class="container-fluid text-center">
-    <h1>{{ recipe.title }}</h1>
-    <img src="{{recipe.image}}" alt="{{recipe.title}}">
-    <p>Calories: {{recipe.calories}}</p>
-    {% if recipe.time != None %}
-    <p>Cooktime: {{recipe.time}} mins</p>
-    {% endif %}
-    <p>Yield: {{recipe.total_yield}} servings</p>
-    <p>Ingredients: <br>
-        {% for ingredient in ingredients %} 
-        {{ingredient}}<br> 
-        {% endfor %}</p>
+<div class="container text-center">
+    <div class="mt-5 row">
+        <img class="m-3" src="{{recipe.image}}" alt="{{recipe.title}}"><br>
+        <div class="col">
+            <h1>{{ recipe.title }}</h1>
+            <h3><b>Calories:</b> {{recipe.calories}}</h3>
+            {% if recipe.time != None %}
+            <h3><b>Cooktime:</b> {{recipe.time}} mins</h3>
+            {% endif %}
+            <h3><b>Yield:</b> {{recipe.total_yield}} servings</h3>
+            <a href="{{recipe.url}}" class="btn btn-info" target="_blank">Full Recipe</a>
+        </div>
+    </div>
+    <hr>
+    <h2>Ingredients: <h2>
+        {% for ingredient in ingredients %}
+            <h4>{{ingredient}}</h4><br>
+        {% endfor %}
+    </p>
 </div>
 {% endblock %}

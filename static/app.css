@@ -1,0 +1,28 @@
+.fa-trash-alt {
+    color: red;
+}
+
+body {
+    font-family: 'Staatliches', cursive;
+    padding-top: 55px;
+}
+
+.container-photo {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+
+.bottom-left {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+}
+
+.kitchen {
+    width: 100%;
+}
+
+.mussels {
+  width: 300px;
+}

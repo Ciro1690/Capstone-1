@@ -79,6 +79,7 @@ class Recipe(db.Model):
     title = db.Column(db.String,
                     nullable=False)
     image = db.Column(db.String)
+    url = db.Column(db.String)
     calories = db.Column(db.Integer)
     total_yield = db.Column(db.Float)
     time = db.Column(db.Float)
@@ -86,16 +87,3 @@ class Recipe(db.Model):
     username = db.Column(db.String,
                         db.ForeignKey('users.username'))
     user = db.relationship('User', backref='recipes')
-
-class Grocery_list(db.Model):
-    """Grocery list table"""
-
-    __tablename__ = "grocery_lists"
-    id = db.Column(db.Integer,
-                    primary_key=True,
-                    autoincrement=True)
-    ingredient = db.Column(db.String)
-    purchased = db.Column(db.Boolean)
-    username = db.Column(db.String,
-                        db.ForeignKey('users.username'))
-    user = db.relationship('User', backref='grocery_lists')

@@ -2,11 +2,11 @@
 
 from flask import Flask, request, redirect, jsonify, json, render_template, session, flash, url_for
 from flask_debugtoolbar import DebugToolbarExtension
-from models import db, connect_db, User, Recipe, Grocery_list
+from models import db, connect_db, User, Recipe
 from forms import RegisterForm, LoginForm, UserForm
 from sqlalchemy.exc import IntegrityError
 from secrets import EDAMAM_ID, EDAMAM_KEY
-import requests, ast
+import requests, pdb
 import os
 
 app = Flask(__name__)
@@ -30,10 +30,20 @@ def home():
 @app.route("/recipes", methods=['GET', 'POST'])
 def show_recipes():
     search = request.get_json()['params']
+    filtered = request.get_json()['filter']
 
-    res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12")
-    recipe_data = res.json()
-    return jsonify(recipe_data)
+    if filtered == []:
+        res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12")
+        recipe_data = res.json()
+        return jsonify(recipe_data)
+    else:
+        query = f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12"
+        for spec in filtered:
+            addition = f"&diet={spec}"
+            query += addition
+        res = requests.get(query)
+        recipe_data = res.json()
+        return jsonify(recipe_data)
 
 @app.route("/register", methods=['GET', 'POST'])
 def register_user():
@@ -96,17 +106,17 @@ def save_recipe(username):
 
     title = recipe_data['title']
     image = recipe_data['image']
+    url = recipe_data['url']
     calories = recipe_data['calories']
     total_yield = recipe_data['yield']
     time = recipe_data['time']
     ingredients = recipe_data['ingredients']
 
-    recipe = Recipe(title=title, image=image, calories=calories, total_yield=total_yield, time=time, ingredients=ingredients, username=username)
+    recipe = Recipe(title=title, image=image, url=url, calories=calories, total_yield=total_yield, time=time, ingredients=ingredients, username=username)
     db.session.add(recipe)
     db.session.commit()
 
-    flash('Recipe added', 'success')
-    return redirect(f'/users/{username}')
+    return  jsonify({ 'message': "Recipe saved!" })
 
 @app.route("/recipes/<int:recipe_id>")
 def show_recipe(recipe_id):
@@ -121,6 +131,17 @@ def show_recipe(recipe_id):
 
     return render_template("recipe_detail.html", recipe=recipe, ingredients=ingredients)
 
+@app.route("/recipes/<recipe_id>/delete", methods=['POST'])
+def delete_recipe(recipe_id):
+    """Delete a single recipe"""
+    if 'username' not in session:
+        flash("Please log in to view this page", "danger")
+        return redirect('/login')
+    recipe = Recipe.query.get_or_404(recipe_id)
+    db.session.delete(recipe)
+    db.session.commit()
+    flash("Recipe deleted", "success")
+    return redirect(f"/users/{session['username']}")
 
 @app.route("/logout")
 def logout():
