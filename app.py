@@ -12,7 +12,7 @@ import os
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'postgres:///capstone-1')
+    'DATABASE_URL', 'postgres:///recipebox-capstone')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -21,6 +21,9 @@ connect_db(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+api_key = os.getenv("API_KEY", EDAMAM_KEY)
+api_id = os.getenv("API_ID", EDAMAM_ID)
 
 @app.route("/")
 def home():
@@ -33,11 +36,11 @@ def show_recipes():
     filtered = request.get_json()['filter']
 
     if filtered == []:
-        res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12")
+        res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={api_id}&app_key={api_key}&to=12")
         recipe_data = res.json()
         return jsonify(recipe_data)
     else:
-        query = f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12"
+        query = f"https://api.edamam.com/search?q={search}&app_id={api_id}&app_key={api_key}&to=12"
         for spec in filtered:
             addition = f"&diet={spec}"
             query += addition
