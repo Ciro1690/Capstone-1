@@ -5,7 +5,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Recipe
 from forms import RegisterForm, LoginForm, UserForm
 from sqlalchemy.exc import IntegrityError
-from secrets import EDAMAM_ID, EDAMAM_KEY
+# from secrets import EDAMAM_ID, EDAMAM_KEY
 import requests, pdb
 import os
 
@@ -22,8 +22,8 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-api_key = os.getenv("API_KEY", EDAMAM_KEY)
-api_id = os.getenv("API_ID", EDAMAM_ID)
+api_key = os.getenv("API_KEY", 'EDAMAM_KEY')
+api_id = os.getenv("API_ID", 'EDAMAM_ID')
 
 @app.route("/")
 def home():
