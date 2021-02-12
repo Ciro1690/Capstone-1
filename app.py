@@ -5,9 +5,14 @@ from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Recipe
 from forms import RegisterForm, LoginForm, UserForm
 from sqlalchemy.exc import IntegrityError
-# from secrets import EDAMAM_ID, EDAMAM_KEY
 import requests, pdb
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+EDAMAM_ID= os.getenv('EDAMAM_ID')
+EDAMAM_KEY= os.getenv('EDAMAM_KEY')
 
 app = Flask(__name__)
 
@@ -22,9 +27,6 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-api_key = os.getenv("API_KEY", 'EDAMAM_KEY')
-api_id = os.getenv("API_ID", 'EDAMAM_ID')
-
 @app.route("/")
 def home():
     """Direct to Home Page"""
@@ -36,11 +38,11 @@ def show_recipes():
     filtered = request.get_json()['filter']
 
     if filtered == []:
-        res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={api_id}&app_key={api_key}&to=12")
+        res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12")
         recipe_data = res.json()
         return jsonify(recipe_data)
     else:
-        query = f"https://api.edamam.com/search?q={search}&app_id={api_id}&app_key={api_key}&to=12"
+        query = f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12"
         for spec in filtered:
             addition = f"&diet={spec}"
             query += addition
