@@ -8,16 +8,17 @@ from sqlalchemy.exc import IntegrityError
 import requests, pdb
 import os
 from dotenv import load_dotenv
+from boto.s3.connection import S3Connection
 
 load_dotenv()
 
-EDAMAM_ID= os.getenv('EDAMAM_ID')
-EDAMAM_KEY= os.getenv('EDAMAM_KEY')
+EDAMAM_KEY = S3Connection(os.environ['API_KEY'], os.getenv('EDAMAM_KEY'))
+EDAMAM_ID= S3Connection(os.environ['API_ID'], os.getenv('EDAMAM_ID'))
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'postgres:///capstone-1')
+    'DATABASE_URL', 'postgres:///recipebox-capstone')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
