@@ -69,3 +69,10 @@ function handleResponse(resp) {
 }
 
 $("#recipe-search").on("submit", processForm)
+// https://stackoverflow.com/questions/15195662/scroll-to-a-div-after-jquery-form-submit
+$('#recipe-search').on('submit', function () {
+    $('html, body').animate({
+        scrollTop: $(".recipe-list").offset().top
+    }, 2000);
+    return false;
+});
