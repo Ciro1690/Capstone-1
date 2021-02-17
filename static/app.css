@@ -30,7 +30,7 @@ body {
 
 .card {
   background: #ccc;
-  border: 1px solid black;
+  border: 1px solid rgba(0,0,0,.3);
 }
 
 .card-body, .card-img-top {

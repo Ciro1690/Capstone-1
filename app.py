@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 import requests, pdb
 import os
 from dotenv import load_dotenv
+from boto.s3.connection import S3Connection
 
 load_dotenv()
 
