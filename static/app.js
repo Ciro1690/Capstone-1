@@ -43,15 +43,17 @@ function handleResponse(resp) {
         }
         
         let card = `
-        <div class="card col-3">
-            <img class="card-img-top" src="${image}" alt="${title}">
-            <div class="col card-body">
-                <h5 class="card-title">${title}</h5>
-                <p class="card-text">Source: ${source}</p>
-                <a href="${url}" class="btn btn-info" target="_blank">Full Recipe</a>
-                ${username ? `<button id="${index}" class="btn btn-primary">Save Recipe</button>` : ''}
+        <div class="card col-md-4 p-3">
+            <div class="col-md-12">
+                <img class="card-img-top" src="${image}" alt="${title}">
+                <div class="col card-body">
+                    <h5 class="card-title">${title}</h5>
+                    <p class="card-text">Source: ${source}</p>
+                    <a href="${url}" class="btn btn-info" target="_blank">Full Recipe</a>
+                    ${username ? `<button id="${index}" class="btn btn-primary">Save Recipe</button>` : ''}
                 </div>
-            </div>`
+            </div>
+        </div>`
             $('.recipe-list').append(card);
             if (username) {
                 document.getElementById(`${index}`).addEventListener('click', async function () {

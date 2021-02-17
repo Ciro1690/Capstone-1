@@ -3,22 +3,18 @@
 from flask import Flask, request, redirect, jsonify, json, render_template, session, flash, url_for
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Recipe
-from forms import RegisterForm, LoginForm, UserForm
+from forms import RegisterForm, LoginForm, UserForm, RecipeForm
 from sqlalchemy.exc import IntegrityError
 import requests, pdb
 import os
 from dotenv import load_dotenv
-from boto.s3.connection import S3Connection
 
 load_dotenv()
-
-EDAMAM_KEY = S3Connection(os.environ['API_KEY'], os.getenv('EDAMAM_KEY'))
-EDAMAM_ID= S3Connection(os.environ['API_ID'], os.getenv('EDAMAM_ID'))
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'postgres:///recipebox-capstone')
+    'DATABASE_URL', 'postgres:///capstone-1')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -27,6 +23,11 @@ connect_db(app)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+# EDAMAM_KEY = os.getenv('EDAMAM_KEY')
+EDAMAM_KEY = os.environ.get('API_KEY', os.getenv('EDAMAM_KEY'))
+# EDAMAM_ID= os.getenv('EDAMAM_ID')
+EDAMAM_ID= os.environ.get('API_ID', os.getenv('EDAMAM_ID'))
 
 @app.route("/")
 def home():
@@ -148,6 +149,38 @@ def delete_recipe(recipe_id):
     db.session.commit()
     flash("Recipe deleted", "success")
     return redirect(f"/users/{session['username']}")
+
+@app.route("/recipes/new", methods=['GET', 'POST'])
+def create_recipe():
+    """Create new recipe"""
+    if 'username' not in session:
+        flash("Please log in to view this page", "danger")
+        return redirect('/login')
+
+    form = RecipeForm()
+    username = session['username']
+
+    print(form.validate_on_submit())
+    print(form.errors)
+    if form.validate_on_submit():
+        title = form.title.data
+        print(f"---------{title}")
+        image = form.image.data
+        calories = form.calories.data
+        total_yield = form.total_yield.data
+        time = form.time.data
+        ingredients = form.ingredients.data
+
+        user = User.query.get_or_404(username)
+        recipe = Recipe(title=title, image=image, url=None, calories=calories, total_yield=total_yield, time=time, ingredients=ingredients, username=username)
+        print(recipe)
+        db.session.add(recipe)
+        db.session.commit()
+
+        flash('Recipe added', "success")
+        return redirect(f"/users/{username}")
+    return render_template("new_recipe.html", form=form)
+
 
 @app.route("/logout")
 def logout():

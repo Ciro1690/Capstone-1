@@ -25,4 +25,15 @@ body {
 
 .mussels {
   width: 300px;
+  border: 1px solid black;
+}
+
+.card {
+  background: #ccc;
+  border: 1px solid black;
+}
+
+.card-body, .card-img-top {
+  background: white;
+  border: 1px solid black;
 }
