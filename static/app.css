@@ -29,11 +29,23 @@ body {
 }
 
 .card {
-  background: #ccc;
   border: 1px solid rgba(0,0,0,.3);
+}
+
+.ingredients {
+  list-style-position: inside;
 }
 
 .card-body, .card-img-top {
   background: white;
-  border: 1px solid black;
+  border: 1px solid rgba(0,0,0,.3);
+}
+
+.vertical-center {
+  display: flex;
+  align-items: center;  
+}
+
+.recipe-image {
+  border: 1px solid rgba(0,0,0,.3);
 }

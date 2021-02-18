@@ -38,7 +38,7 @@ def home():
 def show_recipes():
     search = request.get_json()['params']
     filtered = request.get_json()['filter']
-
+    
     if filtered == []:
         res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12")
         recipe_data = res.json()
@@ -164,7 +164,6 @@ def create_recipe():
     print(form.errors)
     if form.validate_on_submit():
         title = form.title.data
-        print(f"---------{title}")
         image = form.image.data
         calories = form.calories.data
         total_yield = form.total_yield.data
@@ -173,7 +172,6 @@ def create_recipe():
 
         user = User.query.get_or_404(username)
         recipe = Recipe(title=title, image=image, url=None, calories=calories, total_yield=total_yield, time=time, ingredients=ingredients, username=username)
-        print(recipe)
         db.session.add(recipe)
         db.session.commit()
 

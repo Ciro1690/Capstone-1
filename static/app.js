@@ -41,21 +41,21 @@ function handleResponse(resp) {
             "time": time,
             "ingredients": ingredients
         }
-        
+            
         let card = `
-        <div class="card col-md-4 p-3">
+        <div class="card col-md-4 p-3 bg-dark">
             <div class="col-md-12">
                 <img class="card-img-top" src="${image}" alt="${title}">
                 <div class="col card-body">
                     <h5 class="card-title">${title}</h5>
                     <p class="card-text">Source: ${source}</p>
                     <a href="${url}" class="btn btn-info" target="_blank">Full Recipe</a>
-                    ${username ? `<button id="${index}" class="btn btn-primary">Save Recipe</button>` : ''}
+                    ${username !== 'Login' ? `<button id="${index}" class="btn btn-primary">Save Recipe</button>` : ''}
                 </div>
             </div>
         </div>`
             $('.recipe-list').append(card);
-            if (username) {
+            if (username !== 'Login') {
                 document.getElementById(`${index}`).addEventListener('click', async function () {
                     try {
                         let response = await axios.post(`/users/${username}/recipes/new`, { params: recipeObj });
