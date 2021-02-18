@@ -6,13 +6,12 @@
 
 - Allows a user to search for recipes and organize them in a virtual cookbook  
 - Targeted toward any demographic, but particularly people interested in cooking and keeping track of recipes
-- Users can create a grocery list and add items from their recipes
+- Users can create their own recipes or save recipes from their search
 
 ## Schema 
 
 - Table for users containing username, password, first name, last name and email  
-- Table for recipes containing recipe title, image, URL, yield, ingredients, time, and username
-- Table for grocery list containing id, ingredient, string, purchased and username
+- Table for recipes containing recipe title, image, URL, yield, calories, ingredients, time, and username
 
 ## Potential API issues
 
@@ -22,8 +21,7 @@
 
 - User would start by seeing a homepage with login/register options
 - User would then be redirected to his/her personal recipe page with options to view all recipes, add a personal recipe or search for a new recipe
-- There would be options to view recipes based on different criteria, such as cuisine type or cook time
-- User can add ingredients to a grocery list. The ingredients can be edited or deleted.
+- There would be options to filter recipes based on different criteria, such as high protein, low calories or low-carb
 
 ## Data
 - Edamam API contains information on recipes based on ingredient, nutrients and price
