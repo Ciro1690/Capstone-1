@@ -19,6 +19,10 @@ async function processForm(evt) {
 function handleResponse(resp) {
     $('.recipe-list').empty()
     let recipes = resp['data']['hits']
+    console.log(recipes)
+    if (recipes.length === 0) {
+        alert("Sorry, your search produced no results.")
+    } else {
     for (let recipeInfo of recipes) {
         let recipe = recipeInfo['recipe']
         
@@ -43,9 +47,9 @@ function handleResponse(resp) {
         }
             
         let card = `
-        <div class="card col-md-4 p-3 bg-dark">
+        <div class="card col-md-3 bg-info">
             <div class="col-md-12">
-                <img class="card-img-top" src="${image}" alt="${title}">
+                <img class="card-img-top" src="${image}" alt="No image available">
                 <div class="col card-body">
                     <h5 class="card-title">${title}</h5>
                     <p class="card-text">Source: ${source}</p>
@@ -53,7 +57,8 @@ function handleResponse(resp) {
                     ${username !== 'Login' ? `<button id="${index}" class="btn btn-primary">Save Recipe</button>` : ''}
                 </div>
             </div>
-        </div>`
+        </div>
+        <div class="spacer"></div>`
             $('.recipe-list').append(card);
             if (username !== 'Login') {
                 document.getElementById(`${index}`).addEventListener('click', async function () {
@@ -65,6 +70,7 @@ function handleResponse(resp) {
                     }            
                 });
             }
+        }
     }
 }
 
