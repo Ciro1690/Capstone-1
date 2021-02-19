@@ -8,18 +8,12 @@ last_name string
 
 Recipe
 -
-title string PK
+id int PK
+title string
 image string
 URL string
-yield float
+calories float
+total_yield float
 ingredients string
-time
-instructions string
-username string FK
-
-Grocery_list
--
-id int PK
-ingredient string
-purchased boolean
+time float
 username string FK
