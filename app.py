@@ -24,9 +24,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
-# EDAMAM_KEY = os.getenv('EDAMAM_KEY')
 EDAMAM_KEY = os.environ.get('API_KEY', os.getenv('EDAMAM_KEY'))
-# EDAMAM_ID= os.getenv('EDAMAM_ID')
 EDAMAM_ID= os.environ.get('API_ID', os.getenv('EDAMAM_ID'))
 
 @app.route("/")
@@ -36,6 +34,7 @@ def home():
 
 @app.route("/recipes", methods=['GET', 'POST'])
 def show_recipes():
+    """Search for recipe based on search results and filters and return JSON""" 
     search = request.get_json()['params']
     filtered = request.get_json()['filter']
     
@@ -54,6 +53,7 @@ def show_recipes():
 
 @app.route("/register", methods=['GET', 'POST'])
 def register_user():
+    """Register new user with data from form"""
     form = RegisterForm()
     if form.validate_on_submit():
         username = form.username.data
@@ -78,6 +78,7 @@ def register_user():
 
 @app.route("/login", methods=['GET', 'POST'])
 def login_user():
+    """Authenticate and login user or redirect if authentication fails"""
     form = LoginForm()
     if form.validate_on_submit():
         username = form.username.data
@@ -95,6 +96,7 @@ def login_user():
 
 @app.route("/users/<username>")
 def user_info(username):
+    """Show info on current user"""
     if session['username'] != username:
         flash("Invalid credentials", "danger")
         return redirect('/')
@@ -160,8 +162,6 @@ def create_recipe():
     form = RecipeForm()
     username = session['username']
 
-    print(form.validate_on_submit())
-    print(form.errors)
     if form.validate_on_submit():
         title = form.title.data
         image = form.image.data

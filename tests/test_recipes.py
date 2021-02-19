@@ -8,11 +8,24 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///capstone-test'
 app.config['SQLALCHEMY_ECHO'] = False
 
 app.config['TESTING'] = True
-
+app.config['WTF_CSRF_ENABLED'] = False
 app.config['DEBUG_TB_HOSTS'] = ['dont-show-debug-toolbar']
 
 db.drop_all()
 db.create_all()
+
+USER_DATA = {
+    "username": "testuser",
+    "password": "12345",
+    "email": "test@email.com",
+    "first_name": "test",
+    "last_name": "user"
+}
+
+RECIPE_DATA = {
+    "title": "Chicken", 
+    "ingredients": "chicken, potatoes"
+}
 
 class RecipeViewsTestCase(TestCase):
     """Tests for views for Recipes."""
@@ -20,13 +33,17 @@ class RecipeViewsTestCase(TestCase):
     def setUp(self):
         """Add sample recipe."""
 
-        user = User(username="testuser", password="12345", email="test@email.com", first_name="Test", last_name="User")
+        User.query.delete()
+
+        user = User(**USER_DATA)
         db.session.add(user)
         db.session.commit()
 
+        self.user = user
+
         Recipe.query.delete()
 
-        recipe = Recipe(title="Chicken", username="testuser", ingredients="chicken, potatoes")
+        recipe = Recipe(**RECIPE_DATA)
         db.session.add(recipe)
         db.session.commit()
 
@@ -46,11 +63,19 @@ class RecipeViewsTestCase(TestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn('Chicken', html)
 
-    def test_add_recipe(self):
+    def test_add_post(self):
         with app.test_client() as client:
-            d = {"title": "Clam Chowder", "username": "testuser", "ingredients": "clams, roux, potatoes, bacon"}
+            d = {"title": "Beans", "ingredients": "Beans"}
             resp = client.post("/recipes/new", data=d, follow_redirects=True)
             html = resp.get_data(as_text=True)
 
             self.assertEqual(resp.status_code, 200)
-            self.assertIn("Clam Chowder", html)
+
+    def test_delete_recipe(self):
+        with app.test_client() as client:
+            resp = client.post("recipes/1/delete", follow_redirects=True)
+            recipe = client.get("recipes/1")
+            html = resp.get_data(as_text=True)
+
+            self.assertEqual(recipe.status_code, 404)
+            self.assertNotEqual("Chicken", html)
