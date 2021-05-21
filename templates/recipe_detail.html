@@ -4,22 +4,20 @@
 {% block content %}
 <div class="container text-center">
     <div class="mt-5 row">
-        <div class="vertical-center">
-            <div class="col">
-            <h1>{{ recipe.title }}</h1>
-            {% if recipe.calories != None %}
-            <h3><b>Calories:</b> {{recipe.calories}}</h3>
-            {% endif %}
-            {% if recipe.time != None %}
-            <h3><b>Cooktime:</b> {{recipe.time}} mins</h3>
-            {% endif %}
-            {% if recipe.total_yield != None %}
-            <h3><b>Yield:</b> {{recipe.total_yield}} servings</h3>
-            {% endif %}
-            {% if recipe.url != None %}
-            <a href="{{recipe.url}}" class="btn btn-info" target="_blank">Full Recipe</a>
-            {% endif %}
-            </div>
+        <div class="col-sm">
+        <h1>{{ recipe.title }}</h1>
+        {% if recipe.calories != None %}
+        <h3><b>Calories:</b> {{recipe.calories}}</h3>
+        {% endif %}
+        {% if recipe.time != None %}
+        <h3><b>Cooktime:</b> {{recipe.time}} mins</h3>
+        {% endif %}
+        {% if recipe.total_yield != None %}
+        <h3><b>Yield:</b> {{recipe.total_yield}} servings</h3>
+        {% endif %}
+        {% if recipe.url != None %}
+        <a href="{{recipe.url}}" class="btn btn-info" target="_blank">Full Recipe</a>
+        {% endif %}
         </div>
     {% if recipe.image %}
     <img class="recipe-image m-3" src="{{recipe.image}}" alt="{{recipe.title}}"><br>
