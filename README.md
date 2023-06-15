@@ -9,7 +9,7 @@
 - Once logged in, users can create their own recipes or save recipes from their search
 - A basic search will produce recipe images and titles with a link to the full recipe on an external website
 - Once saved, a recipe will display all recipe information available from the following: title, image, url, calories, total yield, ingredients, and cook time
-- Site is hosted at the following URL: https://recipebox-capstone.herokuapp.com/
+- Site is hosted at the following URL: https://ciro-blogly.onrender.com
 
 ## Schema 
 
@@ -40,5 +40,5 @@
 - Link to API - https://developer.edamam.com/edamam-docs-recipe-api
 
 ## Technology Stack
-- Site was created using Python & Flask for the back end and Javascript for the front end
+- Site was created uFsing Python & Flask for the back end and Javascript for the front end
 - Additional dependencies include Bootstrap, SQLAlchemy, WTForms & Axios
