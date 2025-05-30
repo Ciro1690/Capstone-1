@@ -11,7 +11,7 @@ import requests, pdb
 import os
 import logging
 from dotenv import load_dotenv
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs, urlencode
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -33,20 +33,28 @@ try:
     if not database_url:
         raise ValueError("DATABASE_URL environment variable is not set")
     
-    # Parse the URL to add additional parameters
+    # Parse the URL
     parsed = urlparse(database_url)
     
-    # Add SSL mode and other connection parameters
+    # Convert postgres:// to postgresql://
     if parsed.scheme == 'postgres':
         database_url = database_url.replace('postgres://', 'postgresql://', 1)
     
-    # Add connection parameters
-    if '?' not in database_url:
-        database_url += '?'
-    else:
-        database_url += '&'
+    # Parse existing query parameters
+    query_params = parse_qs(parsed.query)
     
-    database_url += 'sslmode=require&connect_timeout=10'
+    # Add required Supabase parameters
+    query_params.update({
+        'sslmode': ['require'],
+        'connect_timeout': ['10'],
+        'application_name': ['recipebox'],
+        'options': ['-c timezone=UTC']
+    })
+    
+    # Reconstruct the URL with new parameters
+    parsed = urlparse(database_url)
+    new_query = urlencode(query_params, doseq=True)
+    database_url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}?{new_query}"
     
     app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -64,8 +72,12 @@ try:
     
     # Test the connection
     with app.app_context():
-        db.engine.connect()
-        logger.info("Database connection test successful")
+        try:
+            db.engine.connect()
+            logger.info("Database connection test successful")
+        except Exception as e:
+            logger.error(f"Database connection test failed: {str(e)}")
+            raise
 except Exception as e:
     logger.error(f"Failed to initialize database: {str(e)}")
     raise
