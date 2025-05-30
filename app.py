@@ -6,7 +6,7 @@ from models import db, connect_db, User, Recipe
 from forms import RegisterForm, LoginForm, UserForm, RecipeForm
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 import requests, pdb
 import os
 import logging
@@ -26,9 +26,23 @@ logger.info(f"Database URL configured: {'Yes' if os.environ.get('DATABASE_URL') 
 logger.info(f"Secret Key configured: {'Yes' if os.environ.get('SECRET_KEY') else 'No'}")
 logger.info(f"Edamam credentials configured: {'Yes' if os.environ.get('EDAMAM_KEY') and os.environ.get('EDAMAM_ID') else 'No'}")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SQLALCHEMY_ECHO'] = True
+# Configure database
+try:
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
+    if not app.config['SQLALCHEMY_DATABASE_URI']:
+        raise ValueError("DATABASE_URL environment variable is not set")
+    
+    # Handle Heroku's postgres:// URL format
+    if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
+        app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
+    
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.config['SQLALCHEMY_ECHO'] = True
+    
+    logger.info("Database URL configured successfully")
+except Exception as e:
+    logger.error(f"Failed to configure database URL: {str(e)}")
+    raise
 
 try:
     db = SQLAlchemy(app)
