@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: recipebox
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.11
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        sync: false
+      - key: EDAMAM_KEY
+        sync: false
+      - key: EDAMAM_ID
+        sync: false 
