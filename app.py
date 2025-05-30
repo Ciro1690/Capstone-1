@@ -13,8 +13,12 @@ load_dotenv()
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'postgres://vlpbjjer:kTGa7Pew6zSWQco2gAJ67p1s0Kx_LeuL@mahmud.db.elephantsql.com/vlpbjjer')
+# Configure database URL for Render
+database_url = os.environ.get('DATABASE_URL', 'postgres://vlpbjjer:kTGa7Pew6zSWQco2gAJ67p1s0Kx_LeuL@mahmud.db.elephantsql.com/vlpbjjer')
+if database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
@@ -185,3 +189,6 @@ def logout():
     session.pop('username')
     flash('You are now logged out', "success")
     return redirect('/')
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
