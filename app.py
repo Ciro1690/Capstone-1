@@ -4,6 +4,8 @@ from flask import Flask, request, redirect, jsonify, json, render_template, sess
 from flask_debugtoolbar import DebugToolbarExtension
 from models import db, connect_db, User, Recipe
 from forms import RegisterForm, LoginForm, UserForm, RecipeForm
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 from sqlalchemy.exc import IntegrityError
 import requests, pdb
 import os
@@ -14,11 +16,12 @@ load_dotenv()
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL', 'postgres://vlpbjjer:kTGa7Pew6zSWQco2gAJ67p1s0Kx_LeuL@mahmud.db.elephantsql.com/vlpbjjer')
+    'DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-connect_db(app)
+db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
@@ -35,21 +38,38 @@ def home():
 @app.route("/recipes", methods=['GET', 'POST'])
 def show_recipes():
     """Search for recipe based on search results and filters and return JSON""" 
-    search = request.get_json()['params']
-    filtered = request.get_json()['filter']
-    
-    if filtered == []:
-        res = requests.get(f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12")
+    try:
+        search = request.get_json()['params']
+        filtered = request.get_json()['filter']
+        
+        # Base URL for v2 API
+        base_url = "https://api.edamam.com/api/recipes/v2"
+        
+        # Build query parameters
+        params = {
+            'type': 'public',
+            'q': search,
+            'app_id': EDAMAM_ID,
+            'app_key': EDAMAM_KEY
+        }
+        
+        # Add diet filters if any
+        if filtered:
+            params['diet'] = ','.join(filtered)
+        
+        # Make the API request
+        res = requests.get(base_url, params=params)
+        res.raise_for_status()  # Raise an error for bad status codes
+        
         recipe_data = res.json()
         return jsonify(recipe_data)
-    else:
-        query = f"https://api.edamam.com/search?q={search}&app_id={EDAMAM_ID}&app_key={EDAMAM_KEY}&to=12"
-        for spec in filtered:
-            addition = f"&diet={spec}"
-            query += addition
-        res = requests.get(query)
-        recipe_data = res.json()
-        return jsonify(recipe_data)
+        
+    except requests.exceptions.RequestException as e:
+        app.logger.error(f"API request failed: {str(e)}")
+        return jsonify({"error": "Failed to fetch recipes. Please try again later."}), 500
+    except Exception as e:
+        app.logger.error(f"Unexpected error: {str(e)}")
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
 
 @app.route("/register", methods=['GET', 'POST'])
 def register_user():

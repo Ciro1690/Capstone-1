@@ -40,5 +40,5 @@
 - Link to API - https://developer.edamam.com/edamam-docs-recipe-api
 
 ## Technology Stack
-- Site was created uFsing Python & Flask for the back end and Javascript for the front end
+- Site was created using Python & Flask for the back end and Javascript for the front end
 - Additional dependencies include Bootstrap, SQLAlchemy, WTForms & Axios
