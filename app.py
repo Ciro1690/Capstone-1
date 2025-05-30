@@ -11,6 +11,7 @@ import requests, pdb
 import os
 import logging
 from dotenv import load_dotenv
+from urllib.parse import urlparse
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,18 +29,31 @@ logger.info(f"Edamam credentials configured: {'Yes' if os.environ.get('EDAMAM_KE
 
 # Configure database
 try:
-    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
-    if not app.config['SQLALCHEMY_DATABASE_URI']:
+    database_url = os.environ.get('DATABASE_URL')
+    if not database_url:
         raise ValueError("DATABASE_URL environment variable is not set")
     
-    # Handle Heroku's postgres:// URL format
-    if app.config['SQLALCHEMY_DATABASE_URI'].startswith("postgres://"):
-        app.config['SQLALCHEMY_DATABASE_URI'] = app.config['SQLALCHEMY_DATABASE_URI'].replace("postgres://", "postgresql://", 1)
+    # Parse the URL to add additional parameters
+    parsed = urlparse(database_url)
     
+    # Add SSL mode and other connection parameters
+    if parsed.scheme == 'postgres':
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    
+    # Add connection parameters
+    if '?' not in database_url:
+        database_url += '?'
+    else:
+        database_url += '&'
+    
+    database_url += 'sslmode=require&connect_timeout=10'
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SQLALCHEMY_ECHO'] = True
     
     logger.info("Database URL configured successfully")
+    logger.info(f"Database host: {parsed.hostname}")
 except Exception as e:
     logger.error(f"Failed to configure database URL: {str(e)}")
     raise
@@ -47,7 +61,11 @@ except Exception as e:
 try:
     db = SQLAlchemy(app)
     migrate = Migrate(app, db)
-    logger.info("Database connection initialized successfully")
+    
+    # Test the connection
+    with app.app_context():
+        db.engine.connect()
+        logger.info("Database connection test successful")
 except Exception as e:
     logger.error(f"Failed to initialize database: {str(e)}")
     raise
