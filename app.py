@@ -12,6 +12,7 @@ import os
 import logging
 from dotenv import load_dotenv
 from urllib.parse import urlparse, parse_qs, urlencode
+import time
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -46,9 +47,13 @@ try:
     # Add required Supabase parameters
     query_params.update({
         'sslmode': ['require'],
-        'connect_timeout': ['10'],
+        'connect_timeout': ['30'],
         'application_name': ['recipebox'],
-        'options': ['-c timezone=UTC']
+        'options': ['-c timezone=UTC'],
+        'keepalives': ['1'],
+        'keepalives_idle': ['30'],
+        'keepalives_interval': ['10'],
+        'keepalives_count': ['5']
     })
     
     # Reconstruct the URL with new parameters
@@ -69,15 +74,7 @@ except Exception as e:
 try:
     db = SQLAlchemy(app)
     migrate = Migrate(app, db)
-    
-    # Test the connection
-    with app.app_context():
-        try:
-            db.engine.connect()
-            logger.info("Database connection test successful")
-        except Exception as e:
-            logger.error(f"Database connection test failed: {str(e)}")
-            raise
+    logger.info("Database connection initialized successfully")
 except Exception as e:
     logger.error(f"Failed to initialize database: {str(e)}")
     raise
@@ -88,6 +85,43 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 EDAMAM_KEY = os.environ.get('API_KEY', os.getenv('EDAMAM_KEY'))
 EDAMAM_ID= os.environ.get('API_ID', os.getenv('EDAMAM_ID'))
+
+def test_db_connection():
+    """Test database connection with retries"""
+    max_retries = 3
+    retry_delay = 5
+    
+    for attempt in range(max_retries):
+        try:
+            with app.app_context():
+                db.engine.connect()
+                logger.info("Database connection test successful")
+                return True
+        except Exception as e:
+            logger.error(f"Database connection attempt {attempt + 1} failed: {str(e)}")
+            if attempt < max_retries - 1:
+                logger.info(f"Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                logger.error("All database connection attempts failed")
+                return False
+
+@app.route("/health")
+def health_check():
+    """Health check endpoint"""
+    try:
+        db_status = test_db_connection()
+        return jsonify({
+            "status": "healthy" if db_status else "unhealthy",
+            "database": "connected" if db_status else "disconnected",
+            "timestamp": time.time()
+        })
+    except Exception as e:
+        return jsonify({
+            "status": "unhealthy",
+            "error": str(e),
+            "timestamp": time.time()
+        }), 500
 
 @app.route("/")
 def home():
