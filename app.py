@@ -9,19 +9,34 @@ from flask_migrate import Migrate
 from sqlalchemy.exc import IntegrityError
 import requests, pdb
 import os
+import logging
 from dotenv import load_dotenv
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get(
-    'DATABASE_URL')
+# Log environment variables (without sensitive values)
+logger.info("Starting application initialization")
+logger.info(f"Database URL configured: {'Yes' if os.environ.get('DATABASE_URL') else 'No'}")
+logger.info(f"Secret Key configured: {'Yes' if os.environ.get('SECRET_KEY') else 'No'}")
+logger.info(f"Edamam credentials configured: {'Yes' if os.environ.get('EDAMAM_KEY') and os.environ.get('EDAMAM_ID') else 'No'}")
+
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
+try:
+    db = SQLAlchemy(app)
+    migrate = Migrate(app, db)
+    logger.info("Database connection initialized successfully")
+except Exception as e:
+    logger.error(f"Failed to initialize database: {str(e)}")
+    raise
 
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', "SECRET!")
 debug = DebugToolbarExtension(app)
